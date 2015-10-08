@@ -58,14 +58,32 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 	def get_assets(self, *args, **kwargs):
 		return dict(js=["js/portlister.js"])
 
+	def get_update_information(self, *args, **kwargs):
+		return dict(
+			gpx=dict(
+				displayName="PortLister",
+				displayVersion=self._plugin_version,
+
+				# use github release method of version check
+				type="github_release",
+				user="markwal",
+				repo="OctoPrint-PortLister",
+				current=self._plugin_version,
+
+				# update method: pip
+				pip="https://github.com/markwal/OctoPrint-PortLister/archive/{target_version}.zip"
+			)
+		)
+
 __plugin_name__ = "PortLister"
 
 def __plugin_load__():
 	global __plugin_implementation__
-	__plugin_implementation__ = PortListerPlugin()
+	plugin = PortListerPlugin()
+	__plugin_implementation__ = plugin
 
-	# global __plugin_hooks__
-	# __plugin_hooks__ = {
-	#    "some.octoprint.hook": __plugin_implementation__.some_hook_handler
-	# }
+	global __plugin_hooks__
+	__plugin_hooks__ = {
+		"octoprint.plugin.softwareupdate.check_config": plugin.get_update_information,
+	}
 
