@@ -60,7 +60,7 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 
 	def get_update_information(self, *args, **kwargs):
 		return dict(
-			gpx=dict(
+			portlister=dict(
 				displayName="PortLister",
 				displayVersion=self._plugin_version,
 
