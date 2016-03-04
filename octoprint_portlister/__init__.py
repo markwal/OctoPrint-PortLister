@@ -31,6 +31,7 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 			self._logger.info("on_port_created connection_options %s", repr(connection_options))
 
 			# is the new device in the port list? yes, tell the view model
+			self._logger.info("Checking if %s is in %s", port, repr(connection_options["ports"]))
 			if port in connection_options["ports"]:
 				self._plugin_manager.send_plugin_message(self._plugin_name, port)
 
@@ -38,6 +39,12 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 				if self._settings.global_get_boolean(["serial", "autoconnect"]):
 					self._logger.info("autoconnect_delay %d", self._settings.get(["autoconnect_delay"]))
 					Timer(self._settings.get(["autoconnect_delay"]), self.do_auto_connect, [port]).start()
+				else:
+					self._logger.info("Not autoconnecting because autoconnect is turned off.")
+			else:
+				self._logger.warning("Won't autoconnect because %s isn't in %s", port, repr(connection_options["ports"]))
+		else:
+			self._logger.warning("Not auto connecting because printer is not closed nor in error state.")
 
 	def on_shutdown(self, *args, **kwargs):
 		self._logger.info("Shutting down file system observer")
