@@ -1,12 +1,14 @@
 # coding=utf-8
 from __future__ import absolute_import
 
+import os
 from threading import Timer
 import watchdog
 from watchdog.observers import Observer
 
 import octoprint.plugin
 from octoprint.printer import get_connection_options
+from octoprint.util import get_exception_string
 
 class PortListEventHandler(watchdog.events.FileSystemEventHandler):
 	def __init__(self, parent):
@@ -18,7 +20,7 @@ class PortListEventHandler(watchdog.events.FileSystemEventHandler):
 
 class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlugin, octoprint.plugin.SettingsPlugin):
 	def on_after_startup(self, *args, **kwargs):
-		self._logger.info("Port Lister %s %s", repr(args), repr(kwargs))
+		self._logger.info("Port Lister %s %s" % (repr(args), repr(kwargs)))
 		event_handler = PortListEventHandler(self)
 		self._observer = Observer()
 		self._observer.schedule(event_handler, "/dev", recursive=False)
@@ -28,10 +30,10 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 		# if we're already connected ignore it
 		if self._printer.is_closed_or_error():
 			connection_options = get_connection_options()
-			self._logger.info("on_port_created connection_options %s", repr(connection_options))
+			self._logger.info("on_port_created connection_options %s" % (repr(connection_options)))
 
 			# is the new device in the port list? yes, tell the view model
-			self._logger.info("Checking if %s is in %s", port, repr(connection_options["ports"]))
+			self._logger.info("Checking if %s is in %s" % (port, repr(connection_options["ports"])))
 			if port in connection_options["ports"]:
 				self._plugin_manager.send_plugin_message(self._plugin_name, port)
 
@@ -42,7 +44,7 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 				else:
 					self._logger.info("Not autoconnecting because autoconnect is turned off.")
 			else:
-				self._logger.warning("Won't autoconnect because %s isn't in %s", port, repr(connection_options["ports"]))
+				self._logger.warning("Won't autoconnect because %s isn't in %s" % (port, repr(connection_options["ports"])))
 		else:
 			self._logger.warning("Not auto connecting because printer is not closed nor in error state.")
 
@@ -52,12 +54,20 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 		self._observer.join()
 
 	def do_auto_connect(self, port, *args, **kwargs):
-		(autoport, baudrate) = self._settings.global_get(["serial", "port"]), self._settings.global_get_int(["serial", "baudrate"])
-		if autoport == port or autoport == "AUTO":
-			printer_profile = self._printer_profile_manager.get_default()
-			profile = printer_profile["id"] if "id" in printer_profile else "_default"
-			self._logger.info("Attempting to connect to %s at %d with profile %s", autoport, baudrate, repr(profile))
-			self._printer.connect(port=autoport, baudrate=baudrate, profile=profile)
+		try:
+			self._logger.info("do_auto_connect")
+			(autoport, baudrate) = self._settings.global_get(["serial", "port"]), self._settings.global_get_int(["serial", "baudrate"])
+			if autoport == "AUTO" or os.path.realpath(autoport) == os.path.realpath(port):
+				self._logger.info("realpath match")
+				printer_profile = self._printer_profile_manager.get_default()
+				profile = printer_profile["id"] if "id" in printer_profile else "_default"
+				self._logger.info("Attempting to connect to %s at %d with profile %s" % (autoport, baudrate, repr(profile)))
+				self._printer.connect(port=autoport, baudrate=baudrate, profile=profile)
+			else:
+				self._logger.info("realpath no match")
+				self._logger.info("Skipping auto connect on %s because it isn't %s" % (os.path.realpath(port), os.path.realpath(autoport)))
+		except:
+			self._logger.error("Exception in do_auto_connect %s", get_exception_string())
 
 	def get_settings_defaults(self, *args, **kwargs):
 		return dict(autoconnect_delay=20)
