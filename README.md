@@ -24,7 +24,8 @@ or manually using this URL:
 
 In ~/.octoprint/config.yaml, the autoconnect_delay can be configured to
 something other than the default 20 seconds it takes my printer to boot up.
-
+```
 plugins:
-  PortLister:
+  portlister:
     autoconnect_delay: 20
+```
