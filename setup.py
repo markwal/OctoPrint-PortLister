@@ -5,7 +5,7 @@
 plugin_identifier = "portlister"
 plugin_package = "octoprint_portlister"
 plugin_name = "OctoPrint-PortLister"
-plugin_version = "0.1.6"
+plugin_version = "0.1.7"
 plugin_description = """PortLister notices when printers get turned on and tells the list of ports to refresh"""
 plugin_author = "Mark Walker"
 plugin_author_email = "markwal@hotmail.com"
