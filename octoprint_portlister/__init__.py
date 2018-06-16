@@ -57,6 +57,10 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 		try:
 			self._logger.info("do_auto_connect")
 			(autoport, baudrate) = self._settings.global_get(["serial", "port"]), self._settings.global_get_int(["serial", "baudrate"])
+			if not autoport:
+				autoport = "AUTO"
+			if not port:
+				port = "AUTO"
 			if autoport == "AUTO" or os.path.realpath(autoport) == os.path.realpath(port):
 				self._logger.info("realpath match")
 				printer_profile = self._printer_profile_manager.get_default()
