@@ -68,7 +68,7 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 				if not self._printer.is_closed_or_error():
 					self._logger.info("Not autoconnecting; printer already connected")
 					return
-				self._logger.info("Attempting to connect to %s at %d with profile %s" % (autoport, baudrate, repr(profile)))
+				self._logger.info("Attempting to connect to {0} at {1} with profile {2}".format(autoport, baudrate, repr(profile)))
 				self._printer.connect(port=autoport, baudrate=baudrate, profile=profile)
 			else:
 				self._logger.info("realpath no match")
