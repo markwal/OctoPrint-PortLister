@@ -18,7 +18,10 @@ class PortListEventHandler(watchdog.events.FileSystemEventHandler):
 		if not event.is_directory:
 			self._parent.on_port_created(event.src_path)
 
-class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlugin, octoprint.plugin.SettingsPlugin):
+class PortListerPlugin(octoprint.plugin.StartupPlugin,
+                       octoprint.plugin.AssetPlugin,
+                       octoprint.plugin.TemplatePlugin,
+                       octoprint.plugin.SettingsPlugin):
 	def on_after_startup(self, *args, **kwargs):
 		self._logger.info("Port Lister %s %s" % (repr(args), repr(kwargs)))
 		event_handler = PortListEventHandler(self)
@@ -39,8 +42,9 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 
 				# if autoconnect and the new port matches, try to connect
 				if self._settings.global_get_boolean(["serial", "autoconnect"]):
-					self._logger.info("autoconnect_delay %d", self._settings.get(["autoconnect_delay"]))
-					Timer(self._settings.get(["autoconnect_delay"]), self.do_auto_connect, [port]).start()
+					autoconnect_delay = self._settings.get_int(["autoconnect_delay"])
+					self._logger.info("autoconnect_delay {0}".format(autoconnect_delay))
+					Timer(autoconnect_delay, self.do_auto_connect, [port]).start()
 				else:
 					self._logger.info("Not autoconnecting because autoconnect is turned off.")
 			else:
@@ -56,7 +60,7 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 	def do_auto_connect(self, port, *args, **kwargs):
 		try:
 			self._logger.info("do_auto_connect")
-			(autoport, baudrate) = self._settings.global_get(["serial", "port"]), self._settings.global_get_int(["serial", "baudrate"])
+			(autoport, baudrate) = self._settings.global_get(["serial", "port"]), self._settings.global_get(["serial", "baudrate"])
 			if not autoport:
 				autoport = "AUTO"
 			if not port:
