@@ -82,6 +82,9 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin,
 	def get_settings_defaults(self, *args, **kwargs):
 		return dict(autoconnect_delay=20)
 
+	def is_template_autoescaped(self, *args, **kwargs):
+		return True
+
 	def get_assets(self, *args, **kwargs):
 		return dict(js=["js/portlister.js"])
 
