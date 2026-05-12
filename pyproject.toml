@@ -1,0 +1,42 @@
+[build-system]
+requires = [
+    "setuptools>=68",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "OctoPrint-PortLister"
+version = "0.1.10"
+description = "PortLister notices when printers get turned on and tells the list of ports to refresh"
+authors = [
+    { name = "Mark Walker", email = "markwal@hotmail.com" },
+]
+requires-python = ">=2.7,<4"
+dependencies = []
+dynamic = [
+    "license",
+]
+
+[project.entry-points."octoprint.plugin"]
+portlister = "octoprint_portlister"
+
+[project.urls]
+Homepage = "https://github.com/markwal/OctoPrint-PortLister"
+
+[project.optional-dependencies]
+develop = [
+    "go-task-bin",
+]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = [
+    "octoprint_portlister",
+    "octoprint_portlister.*",
+]

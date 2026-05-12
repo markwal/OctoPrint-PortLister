@@ -7,7 +7,6 @@ import watchdog
 from watchdog.observers import Observer
 
 import octoprint.plugin
-from octoprint.printer import get_connection_options
 from octoprint.util import get_exception_string
 
 class PortListEventHandler(watchdog.events.FileSystemEventHandler):
@@ -32,7 +31,7 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin,
 	def on_port_created(self, port, *args, **kwargs):
 		# if we're already connected ignore it
 		if self._printer.is_closed_or_error():
-			connection_options = get_connection_options()
+			connection_options = self._printer.get_connection_options()
 			self._logger.info("on_port_created connection_options %s" % (repr(connection_options)))
 
 			# is the new device in the port list? yes, tell the view model
@@ -82,6 +81,9 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin,
 
 	def get_settings_defaults(self, *args, **kwargs):
 		return dict(autoconnect_delay=20)
+
+	def is_template_autoescaped(self, *args, **kwargs):
+		return True
 
 	def get_assets(self, *args, **kwargs):
 		return dict(js=["js/portlister.js"])

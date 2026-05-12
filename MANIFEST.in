@@ -1,1 +1,4 @@
 include README.md
+recursive-include octoprint_portlister/templates *
+recursive-include octoprint_portlister/translations *
+recursive-include octoprint_portlister/static *
