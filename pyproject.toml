@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "OctoPrint-PortLister"
-version = "0.1.10"
+version = "0.1.11"
 description = "PortLister notices when printers get turned on and tells the list of ports to refresh"
 authors = [
     { name = "Mark Walker", email = "markwal@hotmail.com" },
